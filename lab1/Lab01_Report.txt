@@ -10,14 +10,13 @@ Student ID: 67125013
 - Total RAM: 7.76 GB
 
 2. Observation (from htop during stress test):
-The stress test process remained active while it repeatedly calculated
-large factorial values. CPU usage increased during the test, and the
-process was stopped manually with Ctrl+C after the observation period.
+The stress test kept calculating large factorial values. The CPU usage
+increased while the program was running. I stopped the program with Ctrl+C
+after observing it.
 
 3. Analysis:
-The repeated factorial calculations create sustained CPU demand. With two
-logical CPUs available, the workload can keep processor resources busy and
-can increase the CPU utilization shown by htop. The test was CPU-bound rather
-than memory-bound because it performs computation repeatedly and does not
-allocate a large data structure. The profiler reported 7.76 GB of total RAM,
-which provides the hardware baseline for comparing resource usage.
+The repeated calculations made the computer use the CPU for a long time. The
+computer has two logical CPUs, so htop showed CPU activity during the test.
+This test was mainly CPU-bound, not memory-bound, because it kept doing
+calculations and did not create a large data structure. The computer had
+7.76 GB of RAM in total.

@@ -5,35 +5,30 @@ Student ID: 67125013
 ======================================================
 
 1. The Race Condition (Phase 2):
-The final weight is less than the expected value because updating the shared
-weight is a read-modify-write sequence rather than one atomic operation. Two
-threads can read the same old value into `temp`, then both write back the
-same incremented value. One update overwrites the other, so the run produced
-an actual value of 101 instead of the expected value of 200.
+The final weight is too low because changing the shared value uses three
+steps: read, add one, and write. Two threads can read the same value at the
+same time. They then both write the same new value, so one update replaces
+the other. In the test, the expected value was 200 but the actual value was
+101.
 
-The `time.sleep(0.0000001)` call creates an opportunity for the OS scheduler
-to switch threads between the read and the write. This interleaving lets the
-two threads enter the critical section at the same time from the program's
-point of view and exposes the lost-update error.
+The very short `time.sleep(0.0000001)` gives the OS scheduler a chance to
+switch to the other thread between the read and write steps. This timing
+causes the lost updates and shows the race condition.
 
 2. Mutex vs. Semaphore (Phase 3):
-In `producer_consumer.py`, the `mutex` provides mutual exclusion for the
-buffer critical section. It ensures that only one thread at a time changes
-the buffer or its `in_index` and `out_index` values.
+The `mutex` protects the buffer. It allows only one thread at a time to
+change the buffer, `in_index`, or `out_index`.
 
-The `empty` semaphore counts available buffer slots. The producer acquires
-one before writing and blocks when the buffer is full. The `full` semaphore
-counts items available to consume. The consumer acquires one before reading
-and blocks when the buffer is empty. A mutex alone cannot represent how many
-resources are available; it only protects exclusive access. Using a mutex
-for everything could also cause unnecessary blocking and would not provide
-the producer-consumer signaling required by a bounded buffer.
+The `empty` semaphore counts free spaces in the buffer. The producer takes
+one before adding an item and waits when the buffer is full. The `full`
+semaphore counts items ready to read. The consumer takes one before reading
+and waits when the buffer is empty. A mutex only controls one thread's access
+at a time. It cannot count free spaces or items, so it cannot replace both
+semaphores.
 
 3. Deadlock Awareness:
-If the producer acquired `mutex` first and then called `empty.acquire()` while
-the buffer was full, it would block while holding the mutex. The consumer
-would need that same mutex to remove an item and release an empty slot, but it
-could not acquire it. Therefore the producer waits for `empty` while the
-consumer waits for `mutex`, creating a deadlock. Acquiring `empty` first lets
-the producer wait without holding the mutex, so the consumer can continue and
-free a buffer slot.
+If the producer took the `mutex` first while the buffer was full, it would
+wait for an empty slot while still holding the mutex. The consumer would need
+the mutex to remove an item and create an empty slot, but it could not get the
+mutex. Both threads would wait forever. Taking `empty` first lets the
+producer wait without holding the mutex, so the consumer can continue.

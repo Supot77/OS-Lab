@@ -5,43 +5,39 @@ Student ID: 67125013
 ======================================================
 
 1. The Deadlock (Phase 2):
-Model A acquired GPU 0 first, while Model B acquired GPU 1 first. After the
-context switch caused by `sleep(0.1)`, Model A requested GPU 1 and blocked
-because Model B held it. Model B then requested GPU 0 and blocked because
-Model A held it. Each model was waiting for a resource held by the other,
-forming a circular wait. The run showed both waiting messages and was
-stopped with a one-second timeout because the simulation intentionally has no
-deadlock recovery.
+Model A got GPU 0 first, while Model B got GPU 1 first. After `sleep(0.1)`,
+Model A asked for GPU 1, but Model B was holding it. Model B then asked for
+GPU 0, but Model A was holding it. Each model waited for a GPU held by the
+other, so a circular wait occurred. The program was stopped after one second
+because this script has no deadlock recovery.
 
 2. The Solution (Phase 3):
-Model B also requests GPU 0 first, so both models follow the same resource
-ordering: GPU 0, then GPU 1. If Model A holds GPU 0, Model B waits for GPU 0
-without holding GPU 1. Model A can therefore acquire GPU 1, finish, and
-release both GPUs. Model B then proceeds. Since the models cannot each hold
-one GPU while waiting for the other, the circular-wait condition is removed.
+Model B also asks for GPU 0 first. Both models now use the same order: GPU 0,
+then GPU 1. If Model A has GPU 0, Model B waits for GPU 0 without holding
+GPU 1. Model A can get GPU 1, finish, and release both GPUs. Model B can then
+continue. The models cannot hold one GPU each while waiting for the other, so
+the circular wait is removed.
 
 3. Starvation vs Deadlock (Phase 4): Based on the results from `starvation_sim.py`:
-The starvation simulation completed after three seconds and all threads
-continued making progress. The two greedy models acquired the resource about
-24,000 times each, while the Polite_Model acquired it 297 times. This is
-unfair progress, but it is different from the deadlock simulation, where both
-models remain blocked forever and no training can complete.
+The starvation test finished after three seconds, and all threads made some
+progress. The two greedy models got the resource about 24,000 times each,
+while the Polite_Model got it 297 times. This is unfair, but it is different
+from deadlock. In the deadlock test, both models were blocked and could not
+finish.
 
-A scheduler using Aging would gradually increase the priority of a process
-that has waited for a long time. The Polite_Model would therefore become more
-likely to receive CPU time and acquire the resource, preventing the greedy
-models from continuously dominating it. Once it runs, its priority can be
-reduced toward its normal level.
+With Aging, the scheduler increases the priority of a process that has waited
+for a long time. The Polite_Model would then have a better chance to get CPU
+time and use the resource. This would stop the greedy models from always
+getting the resource first. After it runs, its priority can return to normal.
 
 4. Deadlock Detection & Recovery (Phase 3.3):
-- How did the `timeout` parameter simulate the Deadlock Detection mechanism of an Operating System?
-- When the Deadlock was detected, what exact step did Model A take to perform "Recovery" and allow the rest of the system to continue?
+How did the `timeout` parameter simulate deadlock detection? How did Model A
+recover and allow the rest of the system to continue?
 
-The `timeout=2.0` parameter limited how long Model A could wait for GPU 1.
-When the wait exceeded that threshold, the script treated the condition as a
-deadlock detected by an OS watchdog instead of waiting forever.
+The `timeout=2.0` parameter limited Model A's wait for GPU 1. When the wait
+passed two seconds, the script treated it as a deadlock detected by an OS
+watchdog instead of waiting forever.
 
-For recovery, Model A released GPU 0, the resource it already held, and
-returned. This rollback/preemption broke the cycle and allowed Model B to
-acquire GPU 0, finish training, and release its resources. The system then
-completed successfully.
+For recovery, Model A released GPU 0, which it already held, and stopped.
+This broke the cycle. Model B could then get GPU 0, finish training, and
+release its GPUs. The system completed successfully.

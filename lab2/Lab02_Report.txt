@@ -1,4 +1,4 @@
-======================================================
+======================================================
 COE67-222 Operating Systems - Lab 02 Report
 Name: Supot Bamrung
 Student ID: 67125013
@@ -10,20 +10,17 @@ Student ID: 67125013
 - Multiprocessing Time: 7.71 seconds
 
 2. System Observation (htop):
-During the multithreading run, the workload remained primarily limited by
-Python's GIL, so CPU utilization did not scale across the available cores as
-effectively. During the multiprocessing run, separate OS processes could
-execute CPU work in parallel, so htop showed more effective use of the two
-logical CPUs. The multiprocessing run was faster overall, despite the cost
-of creating and joining processes.
+During the multithreading run, the work did not use both CPU cores very well
+because of Python's GIL. During the multiprocessing run, separate processes
+could run at the same time, so htop showed better use of the two logical
+CPUs. Multiprocessing was faster, even though creating processes also took
+some time.
 
 3. Analysis (The GIL):
-Multithreading did not make this CPU-bound code significantly faster because
-the GIL allows only one thread to execute Python bytecode at a time within a
-process. Its measured time, 8.73 seconds, was almost the same as the
-sequential time of 8.93 seconds. Multiprocessing is a better choice for
-CPU-bound tasks such as Machine Learning data augmentation because each
-process has its own Python interpreter and GIL, allowing work to run on
-multiple CPU cores. In this experiment, multiprocessing completed in 7.71
-seconds, the fastest of the three approaches on the two-core system.
-
+Multithreading did not make the CPU work much faster because the GIL allows
+only one thread to run Python code at a time in one process. The threading
+time was 8.73 seconds, which was close to the sequential time of 8.93
+seconds. Multiprocessing is better for CPU-heavy tasks, such as ML data
+augmentation, because each process has its own Python interpreter and GIL.
+This allows the processes to use more than one CPU core. In this test,
+multiprocessing was fastest at 7.71 seconds.
