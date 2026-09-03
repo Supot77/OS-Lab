@@ -16,13 +16,13 @@ Create and activate a virtual environment from the repository root:
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements.txt
+python -m pip install -r lab1/requirements.txt
 ```
 
 Run the hardware profiler with:
 
 ```bash
-python profiler.py
+python lab1/profiler.py
 ```
 
-Run `stress_test.py` only when you are ready to observe CPU usage. Stop it with `Ctrl+C`.
+Run `python lab1/stress_test.py` only when you are ready to observe CPU usage. Stop it with `Ctrl+C`.
