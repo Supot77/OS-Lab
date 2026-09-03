@@ -1,7 +1,7 @@
 ======================================================
 COE67-222 Operating Systems - Lab 04 Report
-Name:
-Student ID:
+Name: Supot Bamrung
+Student ID: 67125013
 ======================================================
 
 1. The Deadlock (Phase 2):
