@@ -1,0 +1,39 @@
+======================================================
+COE67-222 Operating Systems - Lab 03 Report
+Name:
+Student ID:
+======================================================
+
+1. The Race Condition (Phase 2):
+The final weight is less than the expected value because updating the shared
+weight is a read-modify-write sequence rather than one atomic operation. Two
+threads can read the same old value into `temp`, then both write back the
+same incremented value. One update overwrites the other, so the run produced
+an actual value of 101 instead of the expected value of 200.
+
+The `time.sleep(0.0000001)` call creates an opportunity for the OS scheduler
+to switch threads between the read and the write. This interleaving lets the
+two threads enter the critical section at the same time from the program's
+point of view and exposes the lost-update error.
+
+2. Mutex vs. Semaphore (Phase 3):
+In `producer_consumer.py`, the `mutex` provides mutual exclusion for the
+buffer critical section. It ensures that only one thread at a time changes
+the buffer or its `in_index` and `out_index` values.
+
+The `empty` semaphore counts available buffer slots. The producer acquires
+one before writing and blocks when the buffer is full. The `full` semaphore
+counts items available to consume. The consumer acquires one before reading
+and blocks when the buffer is empty. A mutex alone cannot represent how many
+resources are available; it only protects exclusive access. Using a mutex
+for everything could also cause unnecessary blocking and would not provide
+the producer-consumer signaling required by a bounded buffer.
+
+3. Deadlock Awareness:
+If the producer acquired `mutex` first and then called `empty.acquire()` while
+the buffer was full, it would block while holding the mutex. The consumer
+would need that same mutex to remove an item and release an empty slot, but it
+could not acquire it. Therefore the producer waits for `empty` while the
+consumer waits for `mutex`, creating a deadlock. Acquiring `empty` first lets
+the producer wait without holding the mutex, so the consumer can continue and
+free a buffer slot.
