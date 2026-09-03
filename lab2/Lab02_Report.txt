@@ -1,0 +1,29 @@
+======================================================
+COE67-222 Operating Systems - Lab 02 Report
+Name:
+Student ID:
+======================================================
+
+1. Execution Time Comparison:
+- Sequential Time: 8.93 seconds
+- Multithreading Time: 8.73 seconds
+- Multiprocessing Time: 7.71 seconds
+
+2. System Observation (htop):
+During the multithreading run, the workload remained primarily limited by
+Python's GIL, so CPU utilization did not scale across the available cores as
+effectively. During the multiprocessing run, separate OS processes could
+execute CPU work in parallel, so htop showed more effective use of the two
+logical CPUs. The multiprocessing run was faster overall, despite the cost
+of creating and joining processes.
+
+3. Analysis (The GIL):
+Multithreading did not make this CPU-bound code significantly faster because
+the GIL allows only one thread to execute Python bytecode at a time within a
+process. Its measured time, 8.73 seconds, was almost the same as the
+sequential time of 8.93 seconds. Multiprocessing is a better choice for
+CPU-bound tasks such as Machine Learning data augmentation because each
+process has its own Python interpreter and GIL, allowing work to run on
+multiple CPU cores. In this experiment, multiprocessing completed in 7.71
+seconds, the fastest of the three approaches on the two-core system.
+
