@@ -1,7 +1,7 @@
 ======================================================
 COE67-XXX Operating Systems - Lab 01 Report
-Name: 
-Student ID: 
+Name: Supot Bamrung
+Student ID: 67125013
 ======================================================
 
 1. Hardware Baseline:
