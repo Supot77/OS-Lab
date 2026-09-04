@@ -4,19 +4,18 @@ Name: Supot Bamrung
 Student ID: 67125013
 ======================================================
 
-1. Hardware Baseline:
-- OS Version: Linux 6.8.0-1052-azure
-- Number of CPU Cores: 2 logical CPUs
-- Total RAM: 7.76 GB
+1. Hardware Baseline and System Profiling:
+The first experiment used `profiler.py` to display the computer's system
+environment before testing. The machine was running Linux
+6.8.0-1052-azure, with two logical CPUs and 7.76 GB of RAM.
 
-2. Observation (from htop during stress test):
-The stress test kept calculating large factorial values. The CPU usage
-increased while the program was running. I stopped the program with Ctrl+C
-after observing it.
+2. Stress Test Observation:
+When `stress_test.py` was started, it repeatedly calculated large factorial
+values. The CPU usage became high because the lab code forced the processor
+to perform intensive calculations. I used `htop` to observe the CPU activity
+and stopped the test with Ctrl+C.
 
 3. Analysis:
-The repeated calculations made the computer use the CPU for a long time. The
-computer has two logical CPUs, so htop showed CPU activity during the test.
-This test was mainly CPU-bound, not memory-bound, because it kept doing
-calculations and did not create a large data structure. The computer had
-7.76 GB of RAM in total.
+This experiment showed that the workload was mainly CPU-bound rather than
+memory-bound. The program spent most of its time performing calculations and
+did not create a large data structure in memory.

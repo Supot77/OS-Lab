@@ -4,40 +4,32 @@ Name: Supot Bamrung
 Student ID: 67125013
 ======================================================
 
-1. The Deadlock (Phase 2):
-Model A got GPU 0 first, while Model B got GPU 1 first. After `sleep(0.1)`,
-Model A asked for GPU 1, but Model B was holding it. Model B then asked for
-GPU 0, but Model A was holding it. Each model waited for a GPU held by the
-other, so a circular wait occurred. The program was stopped after one second
-because this script has no deadlock recovery.
+1. Deadlock Demonstration:
+The fourth experiment demonstrated how a deadlock can occur when two models
+request shared GPUs in different orders. Model A acquired GPU 0 first, while
+Model B acquired GPU 1 first. After `sleep(0.1)`, Model A requested GPU 1 and
+Model B requested GPU 0. Each model was waiting for a GPU held by the other,
+so a circular wait occurred. The program had no recovery mechanism and was
+stopped after one second.
 
-2. The Solution (Phase 3):
-Model B also asks for GPU 0 first. Both models now use the same order: GPU 0,
-then GPU 1. If Model A has GPU 0, Model B waits for GPU 0 without holding
-GPU 1. Model A can get GPU 1, finish, and release both GPUs. Model B can then
-continue. The models cannot hold one GPU each while waiting for the other, so
-the circular wait is removed.
+2. Deadlock Avoidance:
+The deadlock was avoided by making both models request the GPUs in the same
+order: GPU 0 followed by GPU 1. If Model A acquired GPU 0, Model B waited for
+GPU 0 without holding GPU 1. Model A could then acquire GPU 1, finish, and
+release both resources. This removed the circular wait condition.
 
-3. Starvation vs Deadlock (Phase 4): Based on the results from `starvation_sim.py`:
-The starvation test finished after three seconds, and all threads made some
-progress. The two greedy models got the resource about 24,000 times each,
-while the Polite_Model got it 297 times. This is unfair, but it is different
-from deadlock. In the deadlock test, both models were blocked and could not
-finish.
+3. Starvation vs. Deadlock:
+The starvation experiment showed a different problem. After three seconds,
+all threads had made some progress, but the two greedy models acquired the
+resource about 24,000 times each while `Polite_Model` acquired it only 297
+times. This was unfair, but it was not a deadlock because the threads were
+still able to continue. An aging scheduler could increase the priority of a
+process that had waited for a long time, giving `Polite_Model` a fairer chance
+to run.
 
-With Aging, the scheduler increases the priority of a process that has waited
-for a long time. The Polite_Model would then have a better chance to get CPU
-time and use the resource. This would stop the greedy models from always
-getting the resource first. After it runs, its priority can return to normal.
-
-4. Deadlock Detection & Recovery (Phase 3.3):
-How did the `timeout` parameter simulate deadlock detection? How did Model A
-recover and allow the rest of the system to continue?
-
-The `timeout=2.0` parameter limited Model A's wait for GPU 1. When the wait
-passed two seconds, the script treated it as a deadlock detected by an OS
-watchdog instead of waiting forever.
-
-For recovery, Model A released GPU 0, which it already held, and stopped.
-This broke the cycle. Model B could then get GPU 0, finish training, and
-release its GPUs. The system completed successfully.
+4. Deadlock Detection and Recovery:
+Finally, `timeout=2.0` simulated deadlock detection by limiting Model A's
+wait for GPU 1. When the timeout expired, an OS watchdog treated the wait as
+a deadlock instead of allowing the program to wait forever. Model A then
+released GPU 0 and stopped, breaking the cycle. Model B could acquire GPU 0,
+finish its work, and release its GPUs, allowing the system to complete.

@@ -4,31 +4,26 @@ Name: Supot Bamrung
 Student ID: 67125013
 ======================================================
 
-1. The Race Condition (Phase 2):
-The final weight is too low because changing the shared value uses three
-steps: read, add one, and write. Two threads can read the same value at the
-same time. They then both write the same new value, so one update replaces
-the other. In the test, the expected value was 200 but the actual value was
-101.
+1. Race Condition:
+The third experiment demonstrated a race condition by creating two threads
+that updated the same shared weight. Each update required three steps: read
+the value, add one, and write the result. Because both threads could read the
+same value, one update could overwrite the other. The expected value was 200,
+but the actual value was 101. The short `time.sleep(0.0000001)` made it easier
+for the scheduler to switch threads between the read and write operations.
 
-The very short `time.sleep(0.0000001)` gives the OS scheduler a chance to
-switch to the other thread between the read and write steps. This timing
-causes the lost updates and shows the race condition.
-
-2. Mutex vs. Semaphore (Phase 3):
-The `mutex` protects the buffer. It allows only one thread at a time to
-change the buffer, `in_index`, or `out_index`.
-
-The `empty` semaphore counts free spaces in the buffer. The producer takes
-one before adding an item and waits when the buffer is full. The `full`
-semaphore counts items ready to read. The consumer takes one before reading
-and waits when the buffer is empty. A mutex only controls one thread's access
-at a time. It cannot count free spaces or items, so it cannot replace both
-semaphores.
+2. Producer-Consumer Synchronization:
+The next experiment implemented a producer-consumer system with a bounded
+buffer. The producer loaded image batches into the buffer, while the
+consumer removed them for GPU training. The `mutex` allowed only one thread
+at a time to change the buffer and its indexes. The `empty` semaphore counted
+available buffer slots, and the `full` semaphore counted items ready for the
+consumer. This showed why a mutex alone cannot replace the semaphores: a
+mutex controls access, but it does not count resources.
 
 3. Deadlock Awareness:
-If the producer took the `mutex` first while the buffer was full, it would
-wait for an empty slot while still holding the mutex. The consumer would need
-the mutex to remove an item and create an empty slot, but it could not get the
-mutex. Both threads would wait forever. Taking `empty` first lets the
-producer wait without holding the mutex, so the consumer can continue.
+The experiment also demonstrated how incorrect lock ordering can cause a
+deadlock. If the producer acquired the `mutex` while the buffer was full and
+then waited for an empty slot, the consumer could not acquire the mutex to
+remove an item. Acquiring `empty` before the mutex allows the producer to
+wait without blocking the consumer.
