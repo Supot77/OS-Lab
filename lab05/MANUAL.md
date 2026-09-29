@@ -21,7 +21,7 @@ Open your GitHub Codespaces environment.
 Open the terminal and create a new directory for this week's lab:
 Run the following commands in your terminal:
 
-`python
+`
 mkdir lab05
 cd lab05
 
@@ -35,8 +35,7 @@ Step 2.1: Write the Memory Allocation Script
 Create a file named memory_allocation.py:
 Add the following code to memory_allocation.py:
 
-
-`python
+`
 # memory_allocation.py
 import os
 import psutil
@@ -56,7 +55,7 @@ def main():
     # Creating a massive array of 10 million floating-point numbers
     # In Python, this requests a large continuous logical memory block from the OS
     time.sleep(2)
-    ai_model_weights = [0.0] * 10_000_000
+    ai_model_weights = [0.0] * 10_000_000 
 
     print("Model Loaded successfully!")
     print_memory_usage()
@@ -68,16 +67,16 @@ def main():
 if __name__ == "__main__":
     main()
 
-
-`
 Step 2.2: Execute and Observe
+`
+
 Run the script:
 
-`python
-python memory_allocation.py
-
 `
+python memory_allocation.py
 Observation: Notice the massive jump in RAM usage. Even though you created one single list in Python (Logical memory), the underlying Linux OS had to allocate thousands of physical memory pages to store these 10 million numbers.
+`
+
 4. Phase 3: OS-Aware Optimization - Page Table Simulation (30 Minutes)
 Because Python hides the physical memory addresses from us, we will build a System Simulator. We will write the algorithm that the OS Memory Management Unit (MMU) uses to translate a Logical Address (e.g., Neuron Index 5050) into a Physical RAM Address.
 The Math of Paging:
@@ -88,8 +87,7 @@ Step 3.1: Write the Address Translation Simulator
 Create a file named page_table_sim.py:
 Add the following code to page_table_sim.py:
 
-
-`python
+`
 # page_table_sim.py
 
 # System Constants
@@ -145,17 +143,16 @@ def main():
 if __name__ == "__main__":
     main()
 
-
-`
 Step 3.2: Execute and Observe
+`
+
 Run the simulation script:
 
-
-`python
-python page_table_sim.py
-
 `
+python page_table_sim.py
 Carefully trace the math for Scenario B (Logical Address 3450). See how the OS chops the number by the PAGE_SIZE to find where the data actually lives in the fragmented physical hardware.
+`
+
 5. Phase 4: AI Industry Connection - Loading Massive LLMs (20 Minutes)
 In modern AI engineering, Large Language Models (LLMs) like LLaMA often weigh over 50GB. What if your server only has 16GB of physical RAM?
 AI Engineers use an OS feature called Memory-Mapped Files (mmap). Instead of loading the entire 50GB file into RAM (which would crash the system), mmap tricks the Python program into thinking the file is in RAM by creating entries in the Page Table that point to the hard drive.
@@ -164,8 +161,7 @@ Step 4.1: Simulate Memory Mapping
 Create a file named ai_mmap_model.py:
 Add the following code to ai_mmap_model.py:
 
-
-`python
+`
 # ai_mmap_model.py
 import mmap
 import os
@@ -205,53 +201,49 @@ def main():
 if __name__ == "__main__":
     main()
 
-
-`
 Step 4.2: Execute and Analyze
+`
+
 Run the script:
 
-
-`python
-python ai_mmap_model.py
-
 `
+python ai_mmap_model.py
 Notice that the Physical RAM Usage barely changes, even though we mapped a 50MB file! The OS elegantly managed the memory via the Page Table, fetching only the exact byte we requested. This OS-level trick is the backbone of libraries like HuggingFace Safetensors.
+`
+
 6. Phase 5: Analysis & Conclusion (20 Minutes)
 Save your work to GitHub before proceeding:
 Run the following git commands to submit your progress:
 
-
-`python
+`
 git add .
 git commit -m "Completed Lab 5 coding"
 git push
-
-`
 Lab Report Assignment
+`
+
 Create a file named Lab05_Report.txt, copy the template below, answer the questions, and push it to your repository.
 Use the following template for your report:
 
-
-`python
+`
 ======================================================
 COE67-222 Operating Systems - Lab 05 Report
-Name:
-Student ID:
+Name: 
+Student ID: 
 ======================================================
 1. Address Translation Math (Phase 3):
-Assume an OS has a PAGE_SIZE of 4096 bytes.
+Assume an OS has a PAGE_SIZE of 4096 bytes. 
 If an AI model requests data at Logical Address 10000, calculate:
 - The Page Number: [____]
 - The Offset: [____]
 (Show your calculation steps briefly).
 
 2. Physical Memory Fragmentation:
-In our `page_table_sim.py`, Page 0 was stored in Frame 12, and Page 1 was in Frame 45.
+In our `page_table_sim.py`, Page 0 was stored in Frame 12, and Page 1 was in Frame 45. 
 
 Why does the OS store continuous logical data in scattered/fragmented physical frames instead of putting them right next to each other? What problem does this solve?
 
 3. The AI Context (mmap):
 In Phase 4, we mapped a 50MB file to memory, but the physical RAM usage did not increase significantly. Explain how the OS Virtual Memory and Page Table achieve this, and what actually happens at the OS level when index 25,000,000 is accessed.
-
 
 `

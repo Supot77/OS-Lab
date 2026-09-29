@@ -23,19 +23,17 @@ Step 1.1: Create Your Workspace
 Open your GitHub Codespaces environment.
 Open the terminal and create a new directory:
 
-
-`python
+`
 mkdir lab10
 cd lab10
-
-`
 3. Phase 2: Building the Ultimate AI Cluster OS (50 Minutes)
+`
+
 We will write a comprehensive OS Simulator. It includes a Job Queue, a Scheduler Thread, Memory checks, Deadlock Avoidance, and a Live System Dashboard (like htop).
 Step 2.1: Write the Integration Script
 Create a file named ultimate_cluster_os.py:
 
-
-`python
+`
 # ultimate_cluster_os.py
 import threading
 import time
@@ -48,19 +46,19 @@ class AIClusterOS:
         self.total_ram_gb = total_ram_gb
         self.available_ram_gb = total_ram_gb
         self.ram_lock = threading.Lock()
-
+        
         self.gpu_locks = {i: threading.Lock() for i in range(num_gpus)}
         self.gpu_status = {i: "IDLE" for i in range(num_gpus)}
-
+        
         # 2. OS Queues and State
         self.job_queue = queue.Queue()
         self.active_jobs = []
         self.is_running = True
-
+        
         # 3. Start Background Threads (OS Kernel & Dashboard)
         self.dash_thread = threading.Thread(target=self._dashboard_loop, daemon=True)
         self.dash_thread.start()
-
+        
         self.scheduler_thread = threading.Thread(target=self._os_scheduler_loop)
         self.scheduler_thread.start()
 
@@ -98,7 +96,7 @@ class AIClusterOS:
             print(f"❌ [{job_name}] FAILED: Dataset '{dataset_path}' not found or Permission Denied.")
             self.job_queue.task_done()
             return
-
+        
         self.active_jobs.append(job_name)
 
         # 2. MEMORY MANAGEMENT (Wait until RAM is available to prevent Thrashing) (Lab 5 & 6)
@@ -109,18 +107,18 @@ class AIClusterOS:
                     self.available_ram_gb -= req_ram
                     break
             time.sleep(0.5) # Wait and check again
-
+        
         print(f"🧠 [{job_name}] Allocated {req_ram}GB RAM.")
 
         # 3. DEADLOCK AVOIDANCE (Resource Hierarchy) (Lab 4)
         sorted_gpus = sorted(req_gpus)
         if sorted_gpus:
             print(f"⏳ [{job_name}] Waiting for GPUs {sorted_gpus}...")
-
+        
         for gpu in sorted_gpus:
             self.gpu_locks[gpu].acquire()
             self.gpu_status[gpu] = f"BUSY ({job_name})"
-
+            
         if sorted_gpus:
             print(f"🟢 [{job_name}] Acquired GPUs {sorted_gpus}. Running!")
         else:
@@ -134,16 +132,16 @@ class AIClusterOS:
         for gpu in reversed(sorted_gpus):
             self.gpu_status[gpu] = "IDLE"
             self.gpu_locks[gpu].release()
-
+            
         with self.ram_lock:
             self.available_ram_gb += req_ram
-
+        
         self.active_jobs.remove(job_name)
         self.job_queue.task_done()
 
     def shutdown(self):
         """Waits for all queued jobs to finish before turning off."""
-        self.job_queue.join()
+        self.job_queue.join() 
         self.is_running = False
         self.scheduler_thread.join()
         time.sleep(2.0) # Let dashboard print final state
@@ -153,28 +151,28 @@ def main():
     # Setup: Create a dummy secure dataset file
     with open("secure_dataset.csv", "w") as f:
         f.write("dummy data")
-
+        
     print("=== Booting AI Cluster OS (64GB RAM, 4 GPUs) ===")
     os_system = AIClusterOS(total_ram_gb=64, num_gpus=4)
-
+    
     # -------------------------------------------------------------
     # SIMULATING DIVERSE CONCURRENT AI WORKLOADS
     # -------------------------------------------------------------
-
+    
     # Workload A: Distributed Training (Heavy RAM, Multiple GPUs, Long)
     os_system.submit_job("Workload_A_LLaMA", "secure_dataset.csv", req_ram=40, req_gpus=[2, 1, 0], duration=8)
     time.sleep(1) # Wait a bit before next submission
-
+    
     # Workload B: Data Preprocessing (CPU/IO Bound, Medium RAM, 0 GPUs)
     # OBSERVE: This will run IN PARALLEL with Workload A because it needs no GPUs!
     os_system.submit_job("Workload_B_Preproc", "secure_dataset.csv", req_ram=16, req_gpus=[], duration=6)
     time.sleep(1)
-
+    
     # Workload C: Fast API Inference (Low RAM, 1 GPU, Fast)
     # OBSERVE: This will sneak into the unused GPU 3 while Workload A hogs GPUs 0, 1, 2!
     os_system.submit_job("Workload_C_Infer", "secure_dataset.csv", req_ram=2, req_gpus=[3], duration=3)
     time.sleep(1)
-
+    
     # Malicious/Error Job: Requesting a file that doesn't exist
     os_system.submit_job("Workload_D_Hacker", "secret_keys.txt", req_ram=1, req_gpus=[], duration=1)
 
@@ -186,9 +184,9 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-`
 #### Step 2.2: Execute and Observe (The "Wow" Factor)
+`
+
 Run the script: python ultimate_cluster_os.py
 Observation Task (Watch the Live Dashboard closely!):
 Watch Workload A grab 40GB of RAM and lock GPUs 0, 1, and 2.
@@ -198,29 +196,27 @@ See Workload D get rejected instantly by the OS File System security check.
 4. Phase 3: Final Analysis & Conclusion (50 Minutes)
 Save your final project to GitHub:
 
-
-`python
+`
 git add .
 git commit -m "Completed Lab 10 - Ultimate AI Cluster OS"
 git push
-
-`
 5. Report Assignment
+`
+
 Create a file named Lab10_Report.txt, copy the template below, answer the comprehensive questions, and push it to your repository.
 
-
-`python
+`
 ======================================================
 COE67-222 Operating Systems - Lab 10 Report (Final)
-Name:
-Student ID:
+Name: 
+Student ID: 
 ======================================================
 
 1. The Role of the Operating System:
-In this mini-project, our Python script simulated the major responsibilities of an Operating System.
+In this mini-project, our Python script simulated the major responsibilities of an Operating System. 
 Match the specific code behavior in `ultimate_cluster_os.py` to the corresponding OS concept you learned throughout the semester:
 
-- File System & Permissions (Lab 9):
+- File System & Permissions (Lab 9): 
   [Explain which line of code simulated this and why Workload D failed]
 
 - Memory Management (Labs 5/6):
@@ -233,7 +229,7 @@ Match the specific code behavior in `ultimate_cluster_os.py` to the correspondin
 Look at the output of your Live Dashboard. Explain how the OS successfully ran Workload A (LLaMA Training), Workload B (Preprocessing), and Workload C (Inference) AT THE SAME TIME without crashing. Why didn't they block each other?
 
 3. Course Reflection (AI Engineering Context):
-You are now applying for a role as a Machine Learning Operations (MLOps) Engineer.
+You are now applying for a role as a Machine Learning Operations (MLOps) Engineer. 
 Write a short paragraph explaining how understanding Operating Systems (Process queues, RAM/Virtual Memory limits, Deadlock avoidance, File systems) gives you an advantage over a programmer who only knows how to write basic Python/PyTorch scripts.
 
 `
