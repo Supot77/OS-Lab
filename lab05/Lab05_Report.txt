@@ -1,0 +1,29 @@
+======================================================
+COE67-222 Operating Systems - Lab 05 Report
+Name: Supot Bamrung
+Student ID: 67125013
+======================================================
+
+1. Address Translation Math (Phase 3):
+Assume an OS has a PAGE_SIZE of 4096 bytes.
+If an AI model requests data at Logical Address 10000, calculate:
+- The Page Number: 2
+- The Offset: 1808
+
+Calculation steps:
+- Page Number = Logical Address // PAGE_SIZE = 10000 // 4096 = 2
+- Offset = Logical Address % PAGE_SIZE = 10000 % 4096 = 1808
+(Verification: 2 * 4096 + 1808 = 8192 + 1808 = 10000)
+
+2. Physical Memory Fragmentation:
+In our `page_table_sim.py`, Page 0 was stored in Frame 12, and Page 1 was in Frame 45.
+Why does the OS store continuous logical data in scattered/fragmented physical frames instead of putting them right next to each other? What problem does this solve?
+
+Explanation:
+The OS uses paging to solve the problem of External Fragmentation. In physical RAM, processes are constantly loaded and terminated, creating scattered gaps of free memory. If the OS required contiguous physical memory, large programs (such as AI models) could not be loaded even if the total free memory was sufficient. By decoupling logical addresses from physical addresses via the Page Table, any free physical frame anywhere in RAM can be assigned to any logical page.
+
+3. The AI Context (mmap):
+In Phase 4, we mapped a 50MB file to memory, but the physical RAM usage did not increase significantly. Explain how the OS Virtual Memory and Page Table achieve this, and what actually happens at the OS level when index 25,000,000 is accessed.
+
+Explanation:
+When `mmap` is called, the OS only creates entries in the process's Virtual Memory area and Page Table that link the virtual address range to the file on disk (lazy allocation). Physical RAM frames are not allocated immediately. When index 25,000,000 is accessed, the CPU Memory Management Unit (MMU) finds the page is not in physical RAM and triggers a Page Fault. The OS kernel handles this by reading only that specific 4KB disk block into a physical RAM frame, updating the Page Table, and resuming execution. This allows multi-gigabyte models to be queried with minimal RAM usage.

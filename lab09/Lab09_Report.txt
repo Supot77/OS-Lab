@@ -1,0 +1,26 @@
+======================================================
+COE67-222 Operating Systems - Lab 09 Report
+Name: Supot Bamrung
+Student ID: 67125013
+======================================================
+
+1. Inodes and Metadata:
+In the `inode_inspector.py` script, we printed the "Inode Number". If you rename the file using the Linux `mv` command, will the Inode Number change? Why or why not? (Hint: Think about how the OS separates the file name from the actual data).
+
+Explanation:
+No, the Inode Number will NOT change when renaming or moving a file within the same filesystem. In POSIX/Linux filesystems, filenames and Inodes are decoupled. A directory is essentially a lookup table that maps string names to Inode numbers. The `mv` command merely updates or renames the entry in the directory table to point to the existing Inode. The Inode itself, its metadata, and its data blocks on disk remain identical.
+
+2. POSIX Permissions:
+If you want to set a file's permission so that the Owner has Read/Write/Execute (7), the Group has Read/Execute (5), and Others have absolutely no access (0), what would be the 3-digit octal number you pass into `os.chmod()`?
+
+Explanation:
+The 3-digit octal value is `0o750` (or decimal 488, written in Python as `0o750`):
+- Owner (rwx): 4 + 2 + 1 = 7
+- Group (r-x): 4 + 0 + 1 = 5
+- Others (---): 0 + 0 + 0 = 0
+
+3. The AI Context:
+Why is it safer to rely on Operating System file permissions (like `os.chmod(0o444)`) to protect production model weights rather than relying solely on application-level logic or Python try-except blocks?
+
+Explanation:
+Application-level try-except blocks or code conventions only guard against bugs within that particular Python script. In a collaborative multi-user GPU cluster (HPC), other users, distributed workers, third-party training libraries, automated pipelines, or shell commands could accidentally run with write access. By configuring OS-level permissions (`os.chmod(0o444)`), write protection is enforced directly by the Linux Kernel during every `open()` system call. The kernel denies any write attempt with a hardware-level `EACCES / PermissionError`, completely independent of what programming language or software is attempting the modification.

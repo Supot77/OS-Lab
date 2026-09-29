@@ -1,0 +1,23 @@
+======================================================
+COE67-222 Operating Systems - Lab 08 Report
+Name: Supot Bamrung
+Student ID: 67125013
+======================================================
+
+1. Disk Scheduling (Phase 2):
+Looking at the output of `disk_scheduler.py`, why did the SCAN algorithm result in a significantly lower "Total Head Movement" compared to FCFS? Explain the logic behind the Elevator behavior.
+
+Explanation:
+In FCFS, requests are serviced strictly in arrival order, causing the disk arm to oscillate wildly back and forth across distant tracks (53 -> 98 -> 183 -> 37 -> 122 -> 14 -> 124 -> 65 -> 67), yielding 640 cylinders of head movement. In contrast, SCAN functions like an elevator: it moves the disk head continuously in one direction (sweeping UP towards cylinder 199) servicing all pending tracks in its path, reaches the boundary, and then reverses direction (sweeping DOWN towards 0). Because requests are sorted monotonically along the trajectory, head movement is minimized to 331 cylinders, substantially reducing seek time and mechanical wear.
+
+2. I/O Bound Concept:
+If an Operating System is described as being "I/O Bound" during a task, what does that actually mean for the CPU? Is the CPU at 100% usage or is it mostly idle? Why?
+
+Explanation:
+When an operating system or workload is described as being I/O Bound, the processing throughput is bottlenecked by the speed of storage device data transfers (disk reads/writes) rather than CPU calculation capabilities. For the CPU, this means it is mostly IDLE (low % CPU utilization, high % I/O wait). Running threads are repeatedly put into the BLOCKED / WAITING state, waiting for the disk controller to complete data transfers and issue hardware interrupts before the CPU can resume execution.
+
+3. AI Industry Connection (Phase 3):
+Explain why storing an AI image dataset as 1,000,000 separate `.jpg` files causes high I/O overhead and GPU starvation compared to packing them into a single sequential binary format (e.g., TFRecord, WebDataset, or HDF5).
+
+Explanation:
+Reading 1,000,000 individual files forces the OS kernel to execute 1,000,000 individual pairs of `open()`, `stat()`, inode lookups, permission checks, and `close()` system calls. This generates immense metadata overhead and forces non-sequential, random disk seek patterns. As a result, the storage pipeline cannot feed image batches fast enough, leading to GPU starvation (GPUs sitting idle at 0% utilization waiting for data). Packing images into a single binary file allows the OS to open the file once and read continuous contiguous blocks sequentially, maximizing I/O bandwidth and keeping GPUs 100% saturated.

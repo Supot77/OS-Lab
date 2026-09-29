@@ -1,0 +1,23 @@
+======================================================
+COE67-222 Operating Systems - Lab 06 Report
+Name: Supot Bamrung
+Student ID: 67125013
+======================================================
+
+1. FIFO vs LRU (Phase 2):
+In the `page_replacement.py` script, why did the LRU algorithm perform better (have fewer page faults) than the FIFO algorithm for the given reference string? Explain how LRU decides which page to evict.
+
+Explanation:
+LRU achieved 7 page faults compared to FIFO's 9 page faults because LRU exploits the principle of temporal locality (pages accessed recently are likely to be accessed again soon). When choosing a victim page to evict, LRU tracks past usage order and evicts the page that has not been accessed for the longest period of time. In contrast, FIFO evicts whichever page entered RAM earliest, completely ignoring whether that page is currently in high demand, which caused it to evict pages right before they were referenced again.
+
+2. Understanding Thrashing (Phase 3):
+Based on your observation of `ai_thrashing.py`, define "Thrashing" in your own words. Why is the processing time significantly higher in Scenario 2?
+
+Explanation:
+Thrashing is an operating system state where the system spends significantly more time swapping pages between physical RAM and disk swap space (handling page faults) than executing actual process instructions. In Scenario 2, the processing time was several thousand times slower because every iteration performed disk read and write operations on secondary storage. Disk I/O latency (microseconds to milliseconds) is orders of magnitude slower than direct RAM CPU memory operations (nanoseconds).
+
+3. AI Engineering Decision:
+If you are training an AI model and your system begins to thrash because the RAM is full, lowering the `batch_size` in your Python code is a common solution. How does lowering the `batch_size` help the Operating System resolve the Thrashing problem?
+
+Explanation:
+Lowering the batch size directly decreases the memory allocated for activation tensors, intermediate feature maps, and gradient buffers during each training iteration. This shrinks the working set size of the training process so that it fits entirely within available physical RAM/VRAM. When the working set fits into physical memory, page faults and disk swap operations cease, immediately resolving the thrashing condition and restoring normal execution speed.
